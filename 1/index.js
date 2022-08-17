@@ -1,25 +1,44 @@
 let http = require("http");
+let url = require("url");
 
 let routes = {
     GET: {
-        "/": () => console.log("method is GET and path is /"),
-        "/home": () => console.log("method is GET and path is /home"),
+        "/": (req, res) => {
+            res.writeHead(200, { "Content-type": "text/html" });
+            res.end("<h1>Get and / route</h1>");
+        },
+        "/home": (req, res) => {
+            res.writeHead(200, { "Content-type": "text/html" });
+            res.end("<h1>Get and /home route</h1>");
+        },
     },
     POST: {
-        "/post": () => console.log("method is POST and path is /post"),
-        "/comment": () => console.log("method is GET and path is /comment"),
+        "/post": () => (req, res) => {
+            res.writeHead(200, { "Content-type": "text/html" });
+            res.end("<h1>Post  and /post route</h1>");
+        },
+        "/comment": () => (req, res) => {
+            res.writeHead(200, { "Content-type": "text/html" });
+            res.end("<h1>Post  and /comment route</h1>");
+        },
+    },
+    NA: (req, res) => {
+        res.writeHead(404, { "Content-type": "text/html" });
+        res.end("<h1>Route not found</h1>")
     }
 }
 
-let start = (req, res) => {
-    routes[req.method][req.url]();
+// let start = (req, res) => {
+//     routes[req.method][req.url]();
 
-    // res.end("method is " + req.method);
-    // res.end("url is " + req.url);
-}
+//     // res.end("method is " + req.method);
+//     // res.end("url is " + req.url);
+// }
 
 let server = http.createServer((req, res) => {
-    routes[req.method][req.url]();
+    let urlObj = url.parse(req.url);
+    let resolveRoute = routes[req.method][urlObj.pathname];
+    resolveRoute !== null && resolveRoute !== undefined ? resolveRoute(req, res) : routes.NA(req, res);
 
 });
 
